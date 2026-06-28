@@ -1,4 +1,7 @@
 fastapi
-uvicorn
+uvicorn[standard]
+gunicorn
 python-dotenv
 supabase
+pytest
+httpx
