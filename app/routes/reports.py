@@ -14,19 +14,19 @@ router = APIRouter(
 # Reporte de ventas por semana
 @router.get("/sales-report", response_model=KPIResponse)
 def weekly_sales(
-    start_date: date = Query(..., description="Start date in YYYY-MM-DD format"),
-    end_date: date = Query(..., description="End date in YYYY-MM-DD format")
+    start_date: date = Query(..., description="La fecha de inicio en formato YYYY-MM-DD"),
+    end_date: date = Query(..., description="La fecha de fin en formato YYYY-MM-DD")
 ):
     if start_date > end_date:
         raise HTTPException(
             status_code=422,
-            detail="start_date must be less than or equal to end_date",
+            detail="La fecha de inicio debe ser menor o igual a la fecha de fin",
         )
 
     if end_date - start_date > timedelta(days=6):
         raise HTTPException(
             status_code=422,
-            detail="The weekly sales report accepts a maximum range of 7 days",
+            detail="El reporte de ventas semanales acepta un rango máximo de 7 días",
         )
 
     return AnalyticsService.get_weekly_sales(

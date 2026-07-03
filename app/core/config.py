@@ -33,7 +33,7 @@ class Settings:
         if not self.supabase_key:
             missing.append("SUPABASE_KEY")
         if missing:
-            raise RuntimeError(f"Missing required environment variables: {', '.join(missing)}")
+            raise RuntimeError(f"Faltan variables de entorno obligatorias: {', '.join(missing)}")
 
 
 @lru_cache
