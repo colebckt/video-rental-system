@@ -8,6 +8,26 @@ from app.core.supabase_client import supabase
 
 logger = logging.getLogger(__name__)
 
+DAY_NAMES = {
+    "Monday": "Lunes",
+    "Tuesday": "Martes",
+    "Wednesday": "Miércoles",
+    "Thursday": "Jueves",
+    "Friday": "Viernes",
+    "Saturday": "Sábado",
+    "Sunday": "Domingo",
+}
+
+ORDER = [
+    "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes",
+    "Sábado",
+    "Domingo",
+]
+
 
 class AnalyticsService:
 
@@ -16,8 +36,8 @@ class AnalyticsService:
 
         start_value = start_date.isoformat()
 
-        # Se suma un día porque payment_date es TIMESTAMP
-        # y se utiliza un rango [inicio, fin)
+        # Se suma un día porque payment_date es TIMESTAMP.
+        # Se utiliza un rango [inicio, fin)
         end_value = (
             end_date + timedelta(days=1)
         ).isoformat()
@@ -51,19 +71,7 @@ class AnalyticsService:
             )
             raise
 
-        # Diccionario dinámico
         sales_by_day = {}
-        
-        # Diccionario para traducir los nombres de los días al español
-        DAY_NAMES = {
-            "Monday": "Lunes",
-            "Tuesday": "Martes",
-            "Wednesday": "Miércoles",
-            "Thursday": "Jueves",
-            "Friday": "Viernes",
-            "Saturday": "Sábado",
-            "Sunday": "Domingo",
-        }
 
         for payment in response.data:
 
@@ -81,7 +89,7 @@ class AnalyticsService:
             )
 
             day = DAY_NAMES[
-                (payment_datetime.strftime("%A"))
+                payment_datetime.strftime("%A")
             ]
 
             sales_by_day[day] = (
@@ -103,28 +111,26 @@ class AnalyticsService:
             else 0
         )
 
+        # Ordenar los días de la semana
+        sales_by_day = {
+            day: sales_by_day[day]
+            for day in ORDER
+            if day in sales_by_day
+        }
+
         logger.info(
             "weekly_sales_report_completed start_date=%s end_date=%s operations=%s total_sales=%.2f",
             start_value,
-            end_value,
+            end_date.isoformat(),
             operations,
             total_sales,
         )
 
         return {
-
             "start_date": start_value,
-
-            # Se devuelve la fecha que ingresó el usuario,
-            # no la utilizada internamente para el filtro.
             "end_date": end_date.isoformat(),
-
             "total_sales": total_sales,
-
             "operations": operations,
-
             "average_ticket": average_ticket,
-
-            "sales_by_day": sales_by_day
-
+            "sales_by_day": sales_by_day,
         }
