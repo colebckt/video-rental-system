@@ -110,6 +110,21 @@ class AnalyticsService:
             if operations
             else 0
         )
+        
+        top_movies_response = (
+            supabase.rpc(
+                "top_movies_by_week",
+                    {
+                        "start_date": start_date.isoformat(),
+                        "end_date": end_date.isoformat(),
+                    },
+            )
+            .execute()
+        )
+
+        top_movies = top_movies_response.data
+
+        total_rentals = sum(movie["rentals"] for movie in top_movies)
 
         # Ordenar los días de la semana
         sales_by_day = {
@@ -132,5 +147,7 @@ class AnalyticsService:
             "total_sales": total_sales,
             "operations": operations,
             "average_ticket": average_ticket,
+            "total_rentals": total_rentals,
             "sales_by_day": sales_by_day,
+            "top_movies": top_movies,
         }
